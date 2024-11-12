@@ -111,6 +111,10 @@ function setup()
    end
 
    shell.run("wget https://raw.githubusercontent.com/Zeepat/CodeForDigitalMiner/refs/heads/main/utils.lua")
+   print("utils.lua downloaded successfully.")
+   
+   -- Load the functions from utils.lua
+   dofile("utils.lua")
 end
 
 done = false
@@ -121,9 +125,13 @@ for i = 1, Settings.MAX_CHUNKS do
       done = true
    end
 
+   -- Ensure utils.lua functions are available
+   dofile("utils.lua")
+
    GlobalVars.m_bIsChunkyTurtle = false
    GlobalVars.m_bHasChunkLoader = false
    GlobalVars.m_bHasChatBox = false
-    
+
+   print("Starting main function for chunk " .. i)
    main(i)
 end
