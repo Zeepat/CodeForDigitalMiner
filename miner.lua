@@ -110,7 +110,7 @@ function setup()
       sleep(1)
    end
 
-   shell.run("wget https://raw.githubusercontent.com/martinjanas/DigitalMinerAutomatization/main/utils.lua")
+   shell.run("wget https://raw.githubusercontent.com/Zeepat/CodeForDigitalMiner/refs/heads/main/utils.lua")
 end
 
 done = false
