@@ -104,13 +104,7 @@ function utils_place_blocks(Blocks, GlobalVars)
                 turtle.select(storage_block_index)
                 turtle.placeUp() -- Place storage block
 
-                -- Optionally place the Chunk Loader if not using a chunky turtle
-                local has_chunkloader_block, chunkloader_block_index = utils_select_item(Blocks.BLOCK_CHUNKLOADER)
-                if not GlobalVars.m_bIsChunkyTurtle and has_chunkloader_block then
-                    GlobalVars.m_bHasChunkLoader = true
-                    turtle.select(chunkloader_block_index)
-                    turtle.placeUp() -- Place chunkloader
-                end
+                
 
                 -- Place the Chat Box if available
                 local has_chatbox_block, chatbox_block_index = utils_select_item(Blocks.BLOCK_CHATBOX)
@@ -169,10 +163,7 @@ function utils_destroy_blocks(GlobalVars)
     turtle.turnLeft()
     turtle.dig() -- Remove storage block
 
-    if not GlobalVars.m_bIsChunkyTurtle and GlobalVars.m_bHasChunkLoader then
-        turtle.forward()
-        turtle.dig() -- Remove chunkloader
-    end
+    
 
     turtle.down()
     turtle.down()

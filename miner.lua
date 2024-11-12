@@ -1,17 +1,3 @@
--- Computercraft script: 
-
--- Mekanism Digital Miner Automator version 2.1 for Minecraft 1.20.1 
--- (or maybe even anything above 1.12.2 with slight edits to the Blocks section) 
--- by MartiNJ409 - https://github.com/martinjanas
--- This script can be found in my repository - https://github.com/martinjanas/DigitalMinerAutomatization
- 
--- This script places & destroys miner, energy block, storage block, chatbox and chunkloader.
--- It can also output miner status to the chat, visible to anyone on servers, can be turned off below in Settings.
--- Also works on AdvancedPeriperals's chunky turtle, so no need for chunkloader.
- 
--- Just place all the required blocks into the turtle.
--- No need to use chunkloader if you are using chunky turtle, chat box is not mandatory.
- 
 -- User Settings Area --
 Settings = {}
 Settings.MAX_CHUNKS = 16 -- The amount of chunks this script will run. (Default 16)
@@ -21,22 +7,22 @@ Blocks = {}
 Blocks.BLOCK_MINER = "mekanism:digital_miner"
 Blocks.BLOCK_ENERGY = "mekanism:quantum_entangloporter" -- Edit this to match your desired block.
 Blocks.BLOCK_STORAGE = "mekanism:quantum_entangloporter" -- Edit this to match your desired block.
-Blocks.BLOCK_CHUNKLOADER = "chickenchunks:chunk_loader" -- Edit this to match your desired block.
 Blocks.BLOCK_CHATBOX = "advancedperipherals:chat_box" -- Edit this only if you are porting to newer/older versions.
 -- User Settings Area --
 
--- Dont touch this if you don't know what you are doing:
+-- Initialization Area --
 GlobalVars = {}
 GlobalVars.m_pMiner = nil
 GlobalVars.m_pChatBox = nil
-GlobalVars.m_bHasChunkLoader = false
-GlobalVars.m_bIsChunkyTurtle = false
+GlobalVars.m_bIsChunkyTurtle = utils_is_chunky_turtle() or peripheral.getType("right") == "advancedMiningTurtle" or peripheral.getType("left") == "advancedMiningTurtle"
 GlobalVars.m_bHasChatBox = false
 
 function main(i)
-   require "utils"
+   -- Load utils.lua
+   dofile("utils.lua")
 
-   GlobalVars.m_bIsChunkyTurtle = utils_is_chunky_turtle()
+   -- Check if the Turtle is a Chunky Turtle or Advanced Mining Turtle
+   GlobalVars.m_bIsChunkyTurtle = utils_is_chunky_turtle() or peripheral.getType("right") == "advancedMiningTurtle" or peripheral.getType("left") == "advancedMiningTurtle"
 
    utils_place_blocks(Blocks, GlobalVars)
 
@@ -74,9 +60,9 @@ function main(i)
             end
          end
 
-         if to_mine % 5 then
+         if to_mine % 5 == 0 then
             local text = string.format("To mine: %d, ETA: %s", to_mine, utils_get_time(seconds))
-		      print(text)
+            print(text)
          end
 
          if (to_mine == 0) then
@@ -85,7 +71,7 @@ function main(i)
                GlobalVars.m_pChatBox.sendMessage(text, "Miner")
                os.sleep(1)
             end
-                
+
             if i == Settings.MAX_CHUNKS and GlobalVars.m_pChatBox and Settings.SEND_TO_CHAT then
                local text = string.format("Pick me up! I am finished!")
                GlobalVars.m_pChatBox.sendMessage(text, "Miner")
@@ -93,9 +79,7 @@ function main(i)
             end
 
             utils_destroy_blocks(GlobalVars)
-
             os.sleep(2)
-
             utils_go_one_chunk()
          end
 
@@ -112,11 +96,10 @@ function setup()
 
    shell.run("wget https://raw.githubusercontent.com/Zeepat/CodeForDigitalMiner/refs/heads/main/utils.lua")
    print("utils.lua downloaded successfully.")
-   
-   -- Load the functions from utils.lua
    dofile("utils.lua")
 end
 
+-- Main Execution Loop
 done = false
 
 for i = 1, Settings.MAX_CHUNKS do
@@ -125,10 +108,7 @@ for i = 1, Settings.MAX_CHUNKS do
       done = true
    end
 
-   -- Ensure utils.lua functions are available
-   dofile("utils.lua")
-
-   GlobalVars.m_bIsChunkyTurtle = false
+   -- Do not overwrite `GlobalVars.m_bIsChunkyTurtle` here
    GlobalVars.m_bHasChunkLoader = false
    GlobalVars.m_bHasChatBox = false
 
