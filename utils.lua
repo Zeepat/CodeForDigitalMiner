@@ -36,7 +36,7 @@ function utils_go_one_chunk()
     -- Turn and move to the next miner position in the grid
     turtle.turnRight()
 
-    for j = 1, 64 do
+    for j = 1, 16 do
         turtle.forward() -- Move 16 blocks (1 chunk)
     end
 
@@ -86,8 +86,11 @@ function utils_place_blocks(Blocks, GlobalVars)
 
                 -- Place the remaining elevated cables
                 for _ = 1, 4 do
-                    turtle.forward()
-                    turtle.placeDown() -- Place elevated cable
+                    if utils_select_item("mekanism:ultimate_universal_cable") then
+                        turtle.placeDown()
+                        turtle.forward()
+                    else
+                        break          
                 end
             end
 
@@ -146,11 +149,14 @@ function utils_destroy_blocks(GlobalVars)
 
     -- Move up to remove the cables (including the one above the QEP)
     turtle.up()
-    for _ = 1, 5 do
-        turtle.digDown() -- Remove cable
-        turtle.forward()
+    for _ = 1, 4 do
+        if utils_select_item("mekanism:ultimate_universal_cable") then
+            turtle.placeDown()
+            turtle.forward()
+        else
+            break
     end
-
+    
     -- Move back to the starting position
     turtle.back()
     turtle.back()

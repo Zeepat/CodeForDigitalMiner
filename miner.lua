@@ -14,7 +14,7 @@ Blocks.BLOCK_CHATBOX = "advancedperipherals:chat_box" -- Edit this only if you a
 GlobalVars = {}
 GlobalVars.m_pMiner = nil
 GlobalVars.m_pChatBox = nil
-GlobalVars.m_bIsChunkyTurtle = utils_is_chunky_turtle() or peripheral.getType("right") == "advancedMiningTurtle" or peripheral.getType("left") == "advancedMiningTurtle"
+-- This line is no longer needed here. The check is done during initialization.
 GlobalVars.m_bHasChatBox = false
 
 function main(i)
