@@ -90,7 +90,8 @@ function utils_place_blocks(Blocks, GlobalVars)
                         turtle.placeDown()
                         turtle.forward()
                     else
-                        break          
+                        break
+                    end          
                 end
             end
 
@@ -155,6 +156,7 @@ function utils_destroy_blocks(GlobalVars)
             turtle.forward()
         else
             break
+        end
     end
     
     -- Move back to the starting position
