@@ -149,15 +149,21 @@ function utils_destroy_blocks(GlobalVars)
     turtle.dig()
 
     -- Move up to remove the cables (including the one above the QEP)
+    -- Move up to remove the cables
     turtle.up()
     for _ = 1, 4 do
-        if utils_select_item("mekanism:ultimate_universal_cable") then
-            turtle.placeDown()
-            turtle.forward()
-        else
+        turtle.digDown()  -- Correct method to dig the cable
+        if not turtle.forward() then
+            -- Handle obstacle or end of path
             break
         end
     end
+    
+    -- Move back to the starting position
+    for _ = 1, 4 do
+        turtle.back()
+    end
+    turtle.down()
     
     -- Move back to the starting position
     turtle.back()
