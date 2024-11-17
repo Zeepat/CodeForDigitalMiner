@@ -15,7 +15,8 @@ If you have other means of loading the chunk and recharging the turtle, then rem
 
 1. Clear a room by 5Wx3Hx5L.  
 
-2. Place the required items like this: \n
+2. Place the required items like this:
+
 **Level 1**
 ![Setup Diagram](images/level_1.png)
 **Level 2**
