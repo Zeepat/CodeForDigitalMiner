@@ -1,117 +1,282 @@
--- User Settings Area --
-Settings = {}
-Settings.MAX_CHUNKS = 16 -- The amount of chunks this script will run. (Default 16)
-Settings.SEND_TO_CHAT = true -- Set this to false if you don't wish for the chatbox to send serverwide messages about the mining status.
+-- Define the items with their respective names
+local ITEMS = {
+   DIGITAL_MINER = "mekanism:machineblock",
+   QUANTUM_ENTANGLOPORTER = "mekanism:machineblock3",
+   ULTIMATE_LOGISTICAL_CABLE = "mekanism:transmitter",
+   RF_CHARGER = "peripheralsplusone:rf_charger"
+}
 
-Blocks = {}
-Blocks.BLOCK_MINER = "mekanism:digital_miner"
-Blocks.BLOCK_ENERGY = "mekanism:quantum_entangloporter" -- Edit this to match your desired block.
-Blocks.BLOCK_STORAGE = "mekanism:quantum_entangloporter" -- Edit this to match your desired block.
-Blocks.BLOCK_CHATBOX = "advancedperipherals:chat_box" -- Edit this only if you are porting to newer/older versions.
--- User Settings Area --
+local miner = peripheral.wrap("top")
 
--- Initialization Area --
-GlobalVars = {}
-GlobalVars.m_pMiner = nil
-GlobalVars.m_pChatBox = nil
--- This line is no longer needed here. The check is done during initialization.
-GlobalVars.m_bHasChatBox = false
+-- Function to select an item by its name
+function utils_select_item(item_name)
+   for slot = 1, 16 do
+       local item_details = turtle.getItemDetail(slot)
+       if item_details and item_details.name == item_name then
+           turtle.select(slot)
+           print("Selected '" .. item_name .. "' in slot " .. slot)
+           return slot
+       end
+   end
+   return nil
+end
 
-function main(i)
-   -- Load utils.lua
-   dofile("utils.lua")
+-- Test Function 1: Preparing placement area
+function clearing_stage()
+   print("Executing clearing_stage: Clearing the area.")
+   turtle.digUp()
+   turtle.turnRight()
+   turtle.dig()
+   turtle.forward()
+   turtle.digUp()
+   turtle.up()
+   turtle.digUp()
+   turtle.turnLeft()
+   turtle.forward()
+   turtle.forward()
+   turtle.turnLeft()
+   turtle.forward()
+   turtle.forward()
+   turtle.digUp()
+   turtle.turnLeft()
+   turtle.forward()
+   turtle.forward()
+   turtle.down()
+   turtle.turnLeft()
+   turtle.turnLeft()
+   print("clearing_stage completed.")
+end
 
-   -- Check if the Turtle is a Chunky Turtle or Advanced Mining Turtle
-   GlobalVars.m_bIsChunkyTurtle = utils_is_chunky_turtle() or peripheral.getType("right") == "advancedMiningTurtle" or peripheral.getType("left") == "advancedMiningTurtle"
+-- Test Function 2: Clearing path
+function clearing_path()
+   print("Executing clearing_path: Clearing path.")
+   for i = 1, 64 do
+       if turtle.dig() then
+           print("Dug block at step " .. i)
+       else
+           print("No block to dig at step " .. i)
+       end
 
-   utils_place_blocks(Blocks, GlobalVars)
+       if turtle.forward() then
+           print("Moved forward to step " .. i)
+       else
+           print("Failed to move forward at step " .. i)
+           break
+       end
+   end
+   print("clearing_path completed.")
+end
 
-   os.sleep(0.15)
 
-   if GlobalVars.m_pMiner then
-      GlobalVars.m_pMiner.start()
+function digging_a_level_in_room()
+   turtle.dig()
+   turtle.forward()
+   turtle.turnRight()
+   turtle.dig()
+   turtle.forward()
+   turtle.turnRight()
+   turtle.dig()
+   turtle.forward()
+   turtle.dig()
+   turtle.forward()
+   turtle.turnRight()
+   turtle.dig()
+   turtle.forward()
+   turtle.dig()
+   turtle.forward()
+   turtle.turnRight()
+   turtle.dig()
+   turtle.forward()
+   turtle.dig()
+   turtle.forward()
+   turtle.dig()
+   turtle.forward()
+   turtle.turnRight()
+   turtle.dig()
+   turtle.forward()
+   turtle.dig()
+   turtle.forward()
+   turtle.dig()
+   turtle.forward()
+   turtle.turnRight()
+   turtle.dig()
+   turtle.forward()
+   turtle.dig()
+   turtle.forward()
+   turtle.dig()
+   turtle.forward()
+   turtle.dig()
+   turtle.forward()
+   turtle.turnRight()
+   turtle.dig()
+   turtle.forward()
+   turtle.dig()
+   turtle.forward()
+   turtle.dig()
+   turtle.forward()
+   turtle.dig()
+   turtle.forward()
+   turtle.turnRight()
+   turtle.dig()
+   turtle.forward()
+   turtle.dig()
+   turtle.forward()
+   turtle.dig()
+   turtle.forward()
+   turtle.dig()
+   turtle.forward()
+   turtle.turnRight()
+   turtle.forward()
+   turtle.forward()
+   turtle.turnRight()
+   turtle.forward()
+   turtle.forward()
+   turtle.turnRight()
+   turtle.turnRight()
+end
 
-      local to_mine_cached = GlobalVars.m_pMiner.getToMine()
+function clear_a_room()
+   digging_a_level_in_room()
+   turtle.digUp()
+   turtle.up()
+   digging_a_level_in_room()
+   turtle.digUp()
+   turtle.up()
+   digging_a_level_in_room()
+   turtle.down()
+   turtle.down()
+end
 
-      while GlobalVars.m_pMiner.isRunning() do
-         local to_mine = GlobalVars.m_pMiner.getToMine()
-         local seconds = (to_mine * 0.5)
+-- Test Function 3: Placing items in correct order
+function block_placements()
+   print("Executing block_placements: Placing items.")
 
-         if GlobalVars.m_pChatBox and Settings.SEND_TO_CHAT then
-            local percentage = (to_mine / to_mine_cached) * 100
-            percentage = math.floor(percentage)
+   -- Select and place Digital Miner
+   local miner_slot = utils_select_item(ITEMS.DIGITAL_MINER)
+   if miner_slot then
+       if turtle.placeUp() then
+           print("Placed Digital Miner.")
+       else
+           print("Failed to place Digital Miner.")
+           return
+       end
+   else
+       print("Cannot place Digital Miner: Item not found.")
+       return
+   end
 
-            if utils_percentage_in_range(percentage, 80, 1) then
-               local text = string.format("20%% of Blocks Mined (%d/%d)", to_mine, to_mine_cached)
-               GlobalVars.m_pChatBox.sendMessage(text, "Miner")
-               os.sleep(2)
-            end
+   turtle.forward()
+   turtle.forward()
+   turtle.up()
 
-            if utils_percentage_in_range(percentage, 50, 1) then
-               local text = string.format("50%% of Blocks Mined (%d/%d)", to_mine, to_mine_cached)
-               GlobalVars.m_pChatBox.sendMessage(text, "Miner")
-               os.sleep(2)
-            end
+   local entangloporter_slot = utils_select_item(ITEMS.QUANTUM_ENTANGLOPORTER)
+   if entangloporter_slot then
+       turtle.placeUp()
+   end
 
-            if utils_percentage_in_range(percentage, 30, 1) then
-               local text = string.format("70%% of Blocks Mined (%d/%d)", to_mine, to_mine_cached)
-               GlobalVars.m_pChatBox.sendMessage(text, "Miner")
-               os.sleep(2)
-            end
-         end
+   turtle.turnRight()
+   turtle.forward()
+   turtle.forward()
+   turtle.turnRight()
+   turtle.forward()
 
-         if to_mine % 5 == 0 then
-            local text = string.format("To mine: %d, ETA: %s", to_mine, utils_get_time(seconds))
-            print(text)
-         end
+   local entangloporter_slot = utils_select_item(ITEMS.QUANTUM_ENTANGLOPORTER)
+   if entangloporter_slot then
+       turtle.place()
+   end
 
-         if (to_mine == 0) then
-            if GlobalVars.m_pChatBox and Settings.SEND_TO_CHAT then
-               local text = string.format("Done (%d/%d) rounds", i, Settings.MAX_CHUNKS)
-               GlobalVars.m_pChatBox.sendMessage(text, "Miner")
-               os.sleep(1)
-            end
+   turtle.down()
 
-            if i == Settings.MAX_CHUNKS and GlobalVars.m_pChatBox and Settings.SEND_TO_CHAT then
-               local text = string.format("Pick me up! I am finished!")
-               GlobalVars.m_pChatBox.sendMessage(text, "Miner")
-               os.sleep(1)
-            end
+   local charger_slot = utils_select_item(ITEMS.RF_CHARGER)
+   if charger_slot then
+       turtle.place()
+   end
 
-            utils_destroy_blocks(GlobalVars)
-            os.sleep(2)
-            utils_go_one_chunk()
-         end
+   -- Return to starting position
+   turtle.turnRight()
+   turtle.forward()
+   turtle.turnLeft()
+   turtle.forward()
+   turtle.turnRight()
+   turtle.turnRight()
+   print("block_placements completed.")
+end
+   
+-- Main Function: Execute all tests in sequence
+function main()
+   print("Starting Advanced Mining Turtle script.")
+   local mining_speed = 2.5 -- Blocks per second
+   local buffer_time = 30   -- Buffer time in seconds
 
-         os.sleep(0.5)
-      end
+   while true do
+       local status, err = pcall(function()
+           print("Loop start")
+           local miner = peripheral.wrap("top")
+           if not miner then
+               error("Digital Miner not found on 'top'. Check the side.")
+           end
+
+           -- Get the number of blocks left to mine
+           local blocksLeft = miner.getToMine()
+           print("Blocks left to mine: " .. blocksLeft)
+
+           if blocksLeft > 0 then
+               -- Calculate the estimated mining time
+               local estimated_time = math.ceil(blocksLeft / mining_speed)
+               local total_wait_time = estimated_time + buffer_time
+
+               print("Estimated mining time: " .. estimated_time .. " seconds.")
+               print("Waiting for " .. total_wait_time .. " seconds (including buffer).")
+
+               -- Wait for the estimated time plus buffer
+               os.sleep(total_wait_time)
+
+               -- Stop and reset the miner
+               miner.stop()
+               miner.reset()
+               print("Miner stopped and reset.")
+
+               -- Start the placement and digging tasks
+               clearing_stage()
+               clearing_path()
+               clear_a_room()
+               block_placements()
+
+               -- Drop items that are not part of the ITEMS list
+               for slot = 1, 16 do
+                   local item_details = turtle.getItemDetail(slot)
+                   if item_details then
+                       local is_valid_item = false
+                       for _, valid_item in pairs(ITEMS) do
+                           if item_details.name == valid_item then
+                               is_valid_item = true
+                               break
+                           end
+                       end
+                       if not is_valid_item then
+                           turtle.select(slot)
+                           turtle.drop()
+                           print("Dropped item: " .. item_details.name .. " from slot " .. slot)
+                       end
+                   end
+               end
+
+               -- Start the miner again
+               print("Starting the miner.")
+               miner.start()
+               os.sleep(5)
+           else
+               print("No blocks left to mine. Waiting for a while before rechecking...")
+               os.sleep(30)
+           end
+           print("Loop end")
+       end)
+
+       if not status then
+           print("Error encountered: " .. err)
+           os.sleep(5)
+       end
    end
 end
 
-function setup()
-   if fs.exists("utils.lua") then
-      fs.delete("utils.lua")
-      sleep(1)
-   end
-
-   shell.run("wget https://raw.githubusercontent.com/Zeepat/CodeForDigitalMiner/refs/heads/main/utils.lua")
-   print("utils.lua downloaded successfully.")
-   dofile("utils.lua")
-end
-
--- Main Execution Loop
-done = false
-
-for i = 1, Settings.MAX_CHUNKS do
-   if not done then
-      setup()
-      done = true
-   end
-
-   -- Do not overwrite `GlobalVars.m_bIsChunkyTurtle` here
-   GlobalVars.m_bHasChunkLoader = false
-   GlobalVars.m_bHasChatBox = false
-
-   print("Starting main function for chunk " .. i)
-   main(i)
-end
+main()
