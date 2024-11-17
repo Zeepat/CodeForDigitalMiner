@@ -29,7 +29,10 @@ If you have other means of loading the chunk and recharging the turtle, then rem
 4. Type: lua
 
 5. Copy and paste this below and then hit enter:
+
+\```lua
 shell.run("wget https://raw.githubusercontent.com/Zeepat/CodeForDigitalMiner/refs/heads/main/miner.lua")
+\```
 
 6. Exit the Turtle by typing exit(), and then press the Escape button
 
