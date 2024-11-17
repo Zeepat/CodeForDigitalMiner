@@ -34,7 +34,7 @@ If you have other means of loading the chunk and recharging the turtle, then rem
 shell.run("wget https://raw.githubusercontent.com/Zeepat/CodeForDigitalMiner/refs/heads/main/miner.lua")
 ```
 
-6. Exit the Turtle by typing exit(), and then press the Escape button
+6. Exit the Turtle by typing "exit()", and then press the Escape button
 
 7. Right-click the digital miner and edit the config to mine whatever you'd like, and change the radius, max, and min to whatever you'd like.
 
@@ -42,6 +42,6 @@ shell.run("wget https://raw.githubusercontent.com/Zeepat/CodeForDigitalMiner/ref
 
 9. Right-click the turtle.
 
-10. Type: miner
+10. Type "miner" and then hit enter
 
 11. Done!
